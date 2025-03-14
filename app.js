@@ -7,13 +7,13 @@ import 'dotenv/config'
 
 const app = express()
 
-const corsOptions = {
-    origin:process.env.FRONTEND_URL,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-}
+// const corsOptions = {
+//     origin:process.env.FRONTEND_URL,
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+// }
 
 app.use(bodyParser.json())
-app.use(cors(corsOptions))
+app.use(cors())
 const port = 3000
 
 app.post("/create_reminder", async(req, res) => {
