@@ -7,13 +7,27 @@ import 'dotenv/config'
 
 const app = express()
 
-// const corsOptions = {
-//     origin:process.env.FRONTEND_URL,
-//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-// }
+
+
+const allowedOrigins = ["http://localhost:5500","http://127.0.0.1:5500"]
+
+// cors enabled
+app.use(cors({
+    origin: function(origin, cb){
+        if(allowedOrigins.includes(origin) || !origin){
+            cb(null, true)
+        }else{
+            cb(new Error("not allowed by CORS"))
+        }
+    },
+    credentials:true,
+    methods: ["GET", "POST", "PUT", "DELETE"], 
+    allowedHeaders: ["Content-Type", "Authorization"],
+    }
+))
+
 
 app.use(bodyParser.json())
-app.use(cors())
 const port = 3000
 
 app.post("/create_reminder", async(req, res) => {
