@@ -67,7 +67,7 @@ app.get("/get_all_reminders", async(req, res) => {
             //console.log(all_reminders)
             return res.status(200).json(all_reminders.rows)
         }else{
-            res.status(500).json({"msg": 'something is wrong'})
+            return res.status(500).json({"msg": 'something is wrong'})
         }
         
     }catch(error){
@@ -123,7 +123,7 @@ app.get("/get_reminders/:month", async(req,res)=>{
         }
 
     }catch(error){
-        res.status(500).json({"error": error})
+        return res.status(500).json({"error": error})
     }
 })
 
@@ -134,10 +134,10 @@ app.get("/get_reminders/top/:num", async(req, res) => {
         const text = `select * from reminder order by reminder_date asc limit ${num};`
         const top_reminders = await queryDataGivenText(text)
         if(top_reminders){
-            res.status(200).json(top_reminders.rows)
+            return res.status(200).json(top_reminders.rows)
         }
     }catch(error){
-        res.status(500).json({"error": error})
+        return res.status(500).json({"error": error})
     }
 })
 

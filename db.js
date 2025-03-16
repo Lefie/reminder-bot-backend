@@ -1,6 +1,7 @@
 import pg from 'pg'
-const { Client, Pool } = pg
+const { Client } = pg
 import dotenv from 'dotenv'
+import { createTable } from './utils';
 dotenv.config();
 
 //dev
@@ -24,6 +25,7 @@ async function connectDB() {
     try {   
         await client.connect()
         console.log("connected !")
+        await createTable();
     } catch(error) {
         if(error){
             console.log("error connecting to db")
