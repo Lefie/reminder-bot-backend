@@ -20,8 +20,8 @@ app.use(cors({
             cb(new Error("not allowed by CORS"))
         }
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials:true,
-    methods: ["GET", "POST", "PUT", "DELETE"], 
     allowedHeaders: ["Content-Type", "Authorization"],
     }
 ))
