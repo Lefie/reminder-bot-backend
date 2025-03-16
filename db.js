@@ -1,7 +1,7 @@
 import pg from 'pg'
 const { Client } = pg
 import dotenv from 'dotenv'
-import { createTable } from './utils';
+import { createTable } from './utils.js';
 dotenv.config();
 
 //dev
