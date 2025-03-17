@@ -29,7 +29,7 @@ app.use(cors({
 
 app.use(bodyParser.json())
 const port = 3000
-app.options('*', cors());
+//app.options('*', cors());  // ?
 
 app.post("/create_reminder", async(req, res) => {
     let {event_name, event_from, event_to, 
