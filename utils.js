@@ -58,6 +58,7 @@ export async function changeData(text, values=[]) {
         text: text,
         values: values
     }
+    console.log("debugging log",query)
 
     try {
         const res = await db.query(query)
