@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import { changeData, queryDataGivenText } from './utils.js'
 import { client as db} from './db.js'
+import { client as discord_bot } from './bot.js'
 import 'dotenv/config'
 
 const app = express()

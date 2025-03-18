@@ -34,7 +34,7 @@ client.on('ready', () => {
         return
     }
 
-    schedule.scheduleJob('5 0 * * *', async()=>{ 
+    schedule.scheduleJob('11 * * * *', async()=>{ 
         // scan the database daily to check for upcoming reminders for the day
         // store all events in an array, [] 
         const reminders = await getRemindersTodayArray()
@@ -85,3 +85,5 @@ client.on('ready', () => {
 
 // Log in to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
+
+export {client}
