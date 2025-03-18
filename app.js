@@ -4,11 +4,13 @@ import cors from 'cors'
 import { changeData, queryDataGivenText } from './utils.js'
 import { client as db} from './db.js'
 import { client as discord_bot } from './bot.js'
+import { weeklyEmailReminder } from './email.js'
 import 'dotenv/config'
 
 const app = express()
 
 
+weeklyEmailReminder()
 
 const allowedOrigins = ["http://localhost:5500","http://127.0.0.1:5500","https://reminder-bot-frontend.vercel.app"]
 

@@ -42,32 +42,38 @@ async function getRemindersThisWeek(monday, sunday) {
     
 }
 
-const reminders = await getRemindersThisWeek(monday, sunday)
-let htmlMsg = ``
-reminders.forEach((reminder) => {
-    htmlMsg += `
-    <h2>${reminder.event_name} </h2>
-    <p> <strong>From </strong> <mark style="background-color: powderblue;"> ${reminder.event_from === "" ? "???" : reminder.event_from }</mark> <strong>To</strong> <mark style="background-color: powderblue;"> ${reminder.event_to === "" ? "???" : reminder.event_to } </mark> </p>
-    <p> <strong>date:</strong> <mark style="background-color: powderblue;">${reminder.reminder_date}</mark> </p>
-    <br/>
-    `
-})
+async function weeklyEmailReminder() {
+    const reminders = await getRemindersThisWeek(monday, sunday)
+    
+    let htmlMsg = ``
+    reminders.forEach((reminder) => {
+        htmlMsg += `
+        <h2>${reminder.event_name} </h2>
+        <p> <strong>From </strong> <mark style="background-color: powderblue;"> ${reminder.event_from === "" ? "???" : reminder.event_from }</mark> <strong>To</strong> <mark style="background-color: powderblue;"> ${reminder.event_to === "" ? "???" : reminder.event_to } </mark> </p>
+        <p> <strong>date:</strong> <mark style="background-color: powderblue;">${reminder.reminder_date}</mark> </p>
+        <br/>
+        `
+    })
 
-const msg = {
-    to: process.env.EMAIL_ADDRESS, // Change to your recipient
-    from: process.env.EMAIL_ADDRESS, // Change to your verified sender
-    subject: `Reminders This Week ${monday} to ${sunday} `,
-    html: htmlMsg,
+    const msg = {
+        to: process.env.EMAIL_ADDRESS, // Change to your recipient
+        from: process.env.EMAIL_ADDRESS, // Change to your verified sender
+        subject: `Reminders This Week ${monday} to ${sunday} `,
+        html: htmlMsg,
+    }
+
+    schedule.scheduleJob('5 0 * * 1', async()=>{
+        sgMail
+        .send(msg)
+        .then(() => {
+            console.log('Email sent')
+        })
+        .catch((error) => {
+            console.error(error)
+        })
+    })
+
 }
 
-schedule.scheduleJob('5 0 * * 1', async()=>{
-    sgMail
-    .send(msg)
-    .then(() => {
-        console.log('Email sent')
-    })
-    .catch((error) => {
-        console.error(error)
-    })
-})
+export { weeklyEmailReminder }
 
