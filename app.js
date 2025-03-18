@@ -65,7 +65,7 @@ app.post("/create_reminder", async(req, res) => {
 app.get("/get_all_reminders", async(req, res) => {
     
     try {
-        const text = `select * from reminder order by reminder_date asc;`
+        const text = `select * from reminder order by reminder_date asc, event_from asc;`
         const all_reminders = await queryDataGivenText(text)
         if ( all_reminders.rows ) {
             //console.log(all_reminders)
