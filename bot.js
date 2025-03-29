@@ -10,6 +10,11 @@ if(db){
     await createTable()
 }
 
+const rule = new schedule.RecurrenceRule();
+rule.hour = 0;
+rule.minute = 10;
+rule.tz = 'America/New_York';
+
 
 
 // Create a new discord client instance
@@ -34,7 +39,7 @@ client.on('ready', () => {
         return
     }
 
-    schedule.scheduleJob('10 0 * * *', async()=>{ 
+    schedule.scheduleJob(rule, async()=>{ 
         // scan the database daily to check for upcoming reminders for the day
         // store all events in an array, [] 
         const reminders = await getRemindersTodayArray()

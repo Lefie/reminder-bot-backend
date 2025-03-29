@@ -62,7 +62,13 @@ async function weeklyEmailReminder() {
         html: htmlMsg,
     }
 
-    schedule.scheduleJob('5 0 * * 1', async()=>{
+    const rule = new schedule.RecurrenceRule();
+    rule.hour = 0;
+    rule.minute = 5;
+    rule.dayOfWeek = 1
+    rule.tz = 'America/New_York';
+
+    schedule.scheduleJob(rule, async()=>{
         sgMail
         .send(msg)
         .then(() => {
