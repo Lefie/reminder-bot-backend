@@ -63,9 +63,9 @@ async function weeklyEmailReminder() {
     }
 
     const rule = new schedule.RecurrenceRule();
-    rule.hour = 14;
-    rule.minute = 59;
-    rule.dayOfWeek = 2
+    rule.hour = 0;
+    rule.minute = 5;
+    rule.dayOfWeek = 1
     rule.tz = 'America/New_York';
 
     schedule.scheduleJob(rule, async()=>{
