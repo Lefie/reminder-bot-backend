@@ -53,6 +53,28 @@ export async function getRemindersTodayArray() {
     }
 }
 
+export async function clearPastReminders(){
+    try {
+        const date = new Date()
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = (date.getDate()).toString().padStart(2, '0');
+        const date_str = `${year}-${month}-${day}`
+        const statement = `delete from reminder where reminder_date < '${date_str}'`
+        if(db){
+            console.log("Database connected. Executing query...");
+            const res = await db.query(statement);
+            //console.log("Query result:", res.rows); // Print only the rows
+            return res.rows;
+        }  else{
+            console.log("database is not connected")
+        }
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
 export async function changeData(text, values=[]) {
     const query = {
         text: text,
@@ -135,6 +157,8 @@ export function getFutureDate(frequency, current_date, day) {
     console.log("final result",res_str)
     return res_str
 }
+
+clearPastReminders()
 
 
 // test 
