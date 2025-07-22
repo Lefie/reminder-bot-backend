@@ -150,7 +150,9 @@ app.put("/update_reminder/:id", async(req, res) => {
     const id = req.params.id
     let text = `UPDATE reminder SET `
     for (let key in payload) {
-        if(payload.hasOwnProperty(key)) {
+        if(key === "recurring_type"){
+            text += `recurringtype='${payload["recurring_type"]}',`
+        }else if(payload.hasOwnProperty(key)) {
             //console.log(key,payload[key])
             text+= `${key}='${payload[key]}', `
         }
