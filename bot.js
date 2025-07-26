@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import schedule from "node-schedule";
 import { client as db} from './db.js'
-import { createTable, getRemindersTodayArray, changeData, getFutureDate,clearPastReminders } from './utils.js'
+import { createTable, getRemindersTodayArray, changeData, getFutureDate } from './utils.js'
 
 if(db){
     console.log("db is connected")
@@ -11,8 +11,8 @@ if(db){
 }
 
 const rule = new schedule.RecurrenceRule();
-rule.hour = 0;
-rule.minute = 10;
+rule.hour = 6;
+rule.minute = 42;
 rule.tz = 'America/New_York';
 
 
@@ -41,9 +41,6 @@ client.on('ready', () => {
 
     schedule.scheduleJob(rule, async()=>{ 
         // scan the database daily to check for upcoming reminders for the day
-        // clear all the previous reminders
-
-        await clearPastReminders()
         // store all events in an array, [] 
         const reminders = await getRemindersTodayArray()
         console.log("results are below : ")
