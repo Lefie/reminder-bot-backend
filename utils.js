@@ -27,6 +27,32 @@ export async function createTable() {
     }
 }
 
+export async function createNotificationLogsTable() {
+    try {
+        const create_table_query = `
+        CREATE TABLE IF NOT EXISTS notification_logs (
+            log_id SERIAL PRIMARY KEY,
+            reminder_id INTEGER,
+            reminder_name VARCHAR(255),
+            notification_type VARCHAR(20),
+            status VARCHAR(20) NOT NULL, 
+            sent_at TIMESTAMP DEFAULT NOW(), 
+            error_message TEXT
+        );
+        `
+
+        const result = await db.query(create_table_query)
+        console.log("table created: ", result)
+        // create an index at "sent_at" column because we may query using date range
+
+        await db.query(`CREATE INDEX IF NOT EXISTS idx_notification_sent_at ON notification_logs(sent_at)`)
+        console.log("index created on sent at")
+
+    }catch(err) {
+        console.log("error creating notification log table")
+        console.log(err)
+    }
+}
 
 export async function getRemindersTodayArray() {
     try {
@@ -158,7 +184,42 @@ export function getFutureDate(frequency, current_date, day) {
     return res_str
 }
 
-clearPastReminders()
+
+export async function secureQuery(text, values = []) {
+
+    try {
+        const query = {
+            text: text,
+            values: values
+        }
+
+        const res = await db.query(query)
+
+        return res
+
+    }catch(err) {
+        console.log("error: ", err)
+    }
+    
+}
+
+/*
+    return true if the date is validated 
+    return false 
+    correct pattern : yyyy-mm-dd
+       
+
+*/
+export function validateDateString(dateString) {
+    if ( !dateString || dateString === "") {
+        return false
+    }
+
+    const datePattern = /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/
+    const patternMatch = datePattern.test(dateString)
+    return patternMatch
+
+}
 
 
 // test 

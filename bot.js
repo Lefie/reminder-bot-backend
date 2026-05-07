@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 import schedule from "node-schedule";
 import { client as db} from './db.js'
-import { createTable, getRemindersTodayArray, changeData, getFutureDate } from './utils.js'
+import { createTable, getRemindersTodayArray, changeData, getFutureDate, secureQuery } from './utils.js'
 
 if(db){
     console.log("db is connected")
@@ -11,8 +11,8 @@ if(db){
 }
 
 const rule = new schedule.RecurrenceRule();
-rule.hour = 6;
-rule.minute = 42;
+rule.hour = 0;
+rule.minute = 10;
 rule.tz = 'America/New_York';
 
 
@@ -27,6 +27,54 @@ client.once(Events.ClientReady, readyClient => {
     console.log(readyClient.isReady())
     console.log(`ready client token:${readyClient.readyAt}`)
 });
+
+async function logNotification(reminderId, reminderName, status, errorMessage = null) {
+    try {
+        await secureQuery(
+            `INSERT INTO notification_logs (
+                reminder_id, 
+                reminder_name, 
+                status, 
+                error_message
+            ) VALUES ($1, $2, $3, $4)`,
+            [reminderId, reminderName, status, errorMessage]
+        )
+        
+        console.log(` Logged notification: ${reminderName} - ${status}`)
+        
+    } catch(error) {
+        
+        console.log(`Failed to log notification for ${reminderName}:`, error.message)
+    }
+}
+
+async function sendNotificationWithLogging(channel, message, reminder) {
+    try {
+        
+        await channel.send(message)
+        
+        await logNotification(
+            reminder.reminder_id,
+            reminder.event_name,
+            'success'
+        )
+        
+        console.log(`Sent: ${reminder.event_name}`)
+        return true
+        
+    } catch(error) {
+        
+        await logNotification(
+            reminder.reminder_id,
+            reminder.event_name,
+            'failed',
+            error.message  // Store the error message
+        )
+        
+        console.log(`Failed to send ${reminder.event_name}:`, error.message)
+        return false
+    }
+}
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -50,13 +98,26 @@ client.on('ready', () => {
         const today = new Date();
         const todayDate = today.toDateString();
         channel.send(`Reminders for ${todayDate}`)
+
         if(reminders.length!== 0){
-            reminders.forEach((r) => {
-                console.log(r.event_name)
-                const {event_name, event_from, event_to} = r
-                const title = `${event_name}: ${event_from?event_from:''} ${event_to?event_to:''}`
-                channel.send(`${title}`)
-            })
+            let successCount = 0
+            let failCount = 0
+
+            for (const reminder of reminders) {
+                console.log(reminder.event_name)
+                const {event_name, event_from, event_to} = reminder
+                const message = `${event_name}: ${event_from? event_from:''} ${event_to?event_to:''}`
+                const success = await sendNotificationWithLogging(channel, message, reminder )
+                if (success) {
+                    successCount ++
+                }
+                else {
+                    failCount ++
+                }
+               
+            }
+
+            
         }else{
             channel.send(`no reminders today!`)
         }
@@ -68,8 +129,8 @@ client.on('ready', () => {
         reminders.forEach( async(reminder)=>{
             console.log(reminder)
             if (reminder.recurringtype == "none") {
-                const text = `delete from reminder where reminder_id = ${reminder.reminder_id}`
-                changeData(text)
+                const text = `delete from reminder where reminder_id = $1`
+                await secureQuery(text,[reminder.reminder_id])
                 console.log(`reminder at id ${reminder.reminder_id} is deleted`)
             }else {
                 const d = new Date(reminder.reminder_date)
@@ -81,7 +142,7 @@ client.on('ready', () => {
                 console.log("new date: ",new_date)
                 const text = `update reminder set reminder_date = $1 where reminder_id = $2;`
                 const values = [new_date, reminder.reminder_id]
-                await changeData(text, values)
+                await secureQuery(text, values)
                 console.log("value updated!")
             }
         })
